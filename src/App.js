@@ -1,8 +1,9 @@
 import React, { Component } from "react";
 import Chatkit from "@pusher/chatkit";
 
-import Chat from "./Chat";
 import Login from "./Login";
+import RoomList from "./RoomList";
+
 import "./App.css";
 
 class App extends Component {
@@ -16,8 +17,6 @@ class App extends Component {
   };
 
   componentDidMount() {
-    console.log(process.env);
-
     this.tokenProvider = new Chatkit.TokenProvider({
       url: process.env.REACT_APP_TOKEN_URL
     });
@@ -50,7 +49,7 @@ class App extends Component {
           <h1 className="app-title">Chatkit Demo</h1>
         </header>
         {this.currentUser ? (
-          <Chat currentUser={this.currentUser} />
+          <RoomList currentUser={this.currentUser} />
         ) : (
           <Login handleLogin={this.handleLogin} />
         )}

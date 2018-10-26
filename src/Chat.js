@@ -19,7 +19,8 @@ const ChatMessage = ({ currentUserId, message }) => {
 
 class Chat extends Component {
   static propTypes = {
-    currentUser: PropTypes.object.isRequired
+    currentUser: PropTypes.object.isRequired,
+    roomId: PropTypes.string.isRequired
   };
 
   state = {
@@ -32,10 +33,10 @@ class Chat extends Component {
   }
 
   subscribeToRoom() {
-    const { currentUser } = this.props;
+    const { currentUser, roomId } = this.props;
 
     currentUser.subscribeToRoom({
-      roomId: currentUser.rooms[0].id,
+      roomId: Number(roomId),
       hooks: {
         onNewMessage: this.handleNewMessage
       }
@@ -43,13 +44,13 @@ class Chat extends Component {
   }
 
   handleChatSubmit = e => {
-    const { currentUser } = this.props;
+    const { currentUser, roomId } = this.props;
 
     e.preventDefault();
 
     currentUser.sendMessage({
       text: this.state.chatMessage,
-      roomId: currentUser.rooms[0].id
+      roomId: Number(roomId)
     });
 
     this.setState({
@@ -66,8 +67,6 @@ class Chat extends Component {
   handleNewMessage = message => {
     const { messages } = this.state;
 
-    console.log({ message });
-
     messages.push(message);
 
     this.setState({
@@ -80,7 +79,7 @@ class Chat extends Component {
     const { chatMessage, messages } = this.state;
 
     return (
-      <div className="chat">
+      <article className="chat">
         <div className="chat-window">
           <ul className="chat-list">
             {messages.map((item, index) => (
@@ -108,7 +107,7 @@ class Chat extends Component {
             Send
           </button>
         </form>
-      </div>
+      </article>
     );
   }
 }
