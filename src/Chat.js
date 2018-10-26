@@ -25,7 +25,9 @@ class Chat extends Component {
 
   state = {
     chatMessage: "",
-    messages: []
+    isUserTyping: false,
+    messages: [],
+    typingUser: null
   };
 
   componentDidMount() {
@@ -38,7 +40,9 @@ class Chat extends Component {
     currentUser.subscribeToRoom({
       roomId: Number(roomId),
       hooks: {
-        onNewMessage: this.handleNewMessage
+        onNewMessage: this.handleNewMessage,
+        onUserStartedTyping: this.handleUserStartedTyping,
+        onUserStoppedTyping: this.handleUserStoppedTyping
       }
     });
   }
@@ -59,9 +63,17 @@ class Chat extends Component {
   };
 
   handleInputChange = e => {
+    const { currentUser, roomId } = this.props;
+
     this.setState({
       [e.target.id]: e.target.value
     });
+
+    if (e.target.id === "chatMessage" && e.target.value !== "") {
+      currentUser.isTypingIn({
+        roomId: Number(roomId)
+      });
+    } 
   };
 
   handleNewMessage = message => {
@@ -74,9 +86,28 @@ class Chat extends Component {
     });
   };
 
+  handleUserStartedTyping = user => {
+    this.setState({
+      isUserTyping: true,
+      typingUser: user
+    });
+  }
+
+  handleUserStoppedTyping = () => {
+    this.setState({
+      isUserTyping: false,
+      typingUser: null
+    });
+  }
+
   render() {
     const currentUserId = this.props.currentUser.id;
-    const { chatMessage, messages } = this.state;
+    const { chatMessage, isUserTyping, messages, typingUser } = this.state;
+    
+    let typingClassName = "chat-typing-message";
+    if (isUserTyping && typingUser) {
+      typingClassName += " chat-typing-message__visible"
+    }
 
     return (
       <article className="chat">
@@ -90,6 +121,7 @@ class Chat extends Component {
               />
             ))}
           </ul>
+          <span className={typingClassName}>{typingUser && `${typingUser.name}`} is typing...</span>
         </div>
         <form className="chat-form" onSubmit={this.handleChatSubmit}>
           <label className="chat-form__label" htmlFor="chatMessage">
@@ -99,6 +131,7 @@ class Chat extends Component {
             className="chat-form__input"
             id="chatMessage"
             name="chatMessage"
+            placeholder="Your message"
             rows="2"
             value={chatMessage}
             onChange={this.handleInputChange}
