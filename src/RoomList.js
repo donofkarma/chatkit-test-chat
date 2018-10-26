@@ -51,7 +51,7 @@ class RoomList extends Component {
 
     return (
       <article className="rooms">
-        <h2 className="rooms-title">Available Rooms</h2>
+        <h2 className="rooms-title">Your Rooms</h2>
 
         <ul className="rooms-list">
           {currentUser.rooms.map(item => (
